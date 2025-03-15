@@ -6,16 +6,46 @@ const NEWS_API_KEY = process.env.NEXT_PUBLIC_NEW_API;
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const country = searchParams.get("country") || "us"; // Default to 'us'
+    const category = searchParams.get("category") || "technology";
+    const country = searchParams.get("country") || "us";
 
-    const response = await axios.get(`https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${NEWS_API_KEY}`);
+    let endpoint = "https://newsapi.org/v2/top-headlines";
+    let params: any = { apiKey: NEWS_API_KEY };
 
-    const news = (response.data as { articles: any[] }).articles || [];
+    // Handle different categories
+    switch (category) {
+      case "technology":
+        params.category = "technology";
+        params.country = country;
+        break;
+      case "business":
+        params.category = "business";
+        params.country = country;
+        break;
+      case "ai":
+        endpoint = "https://newsapi.org/v2/everything";
+        params.q = "artificial intelligence OR machine learning";
+        params.sortBy = "publishedAt";
+        break;
+      case "india":
+        params.country = "in";
+        break;
+      default:
+        params.category = category;
+        params.country = country;
+    }
+
+    const response = await axios.get(endpoint, { params });
+    const news = response.data.articles || [];
     
     const processedNews = news.map((n: any) => ({
       title: n.title,
       description: n.description,
-      hasSeen: false, // Default to false
+      urlToImage: n.urlToImage,
+      source: n.source.name,
+      publishedAt: n.publishedAt,
+      url: n.url,
+      hasSeen: false,
     }));
 
     return NextResponse.json(processedNews, { status: 200 });
@@ -28,21 +58,44 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { country } = body; // Get country from POST request
+    const { category = "technology", country = "us" } = body;
 
-    if (!country) {
-      return NextResponse.json({ error: "Country is required" }, { status: 400 });
+    let endpoint = "https://newsapi.org/v2/top-headlines";
+    let params: any = { apiKey: NEWS_API_KEY };
+
+    switch (category) {
+      case "technology":
+        params.category = "technology";
+        params.country = country;
+        break;
+      case "business":
+        params.category = "business";
+        params.country = country;
+        break;
+      case "ai":
+        endpoint = "https://newsapi.org/v2/everything";
+        params.q = "artificial intelligence OR machine learning";
+        params.sortBy = "publishedAt";
+        break;
+      case "india":
+        params.country = "in";
+        break;
+      default:
+        params.category = category;
+        params.country = country;
     }
 
-    const response = await axios.get(
-      `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${NEWS_API_KEY}`
-    );
-
-    const news = (response.data as { articles: any[] }).articles || [];
+    const response = await axios.get(endpoint, { params });
+    const news = response.data.articles || [];
+    
     const processedNews = news.map((n: any) => ({
       title: n.title,
       description: n.description,
-      hasSeen: false, // Default to false
+      urlToImage: n.urlToImage,
+      source: n.source.name,
+      publishedAt: n.publishedAt,
+      url: n.url,
+      hasSeen: false,
     }));
 
     return NextResponse.json(processedNews, { status: 200 });
