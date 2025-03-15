@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     }
 
     const response = await axios.get(endpoint, { params });
-    const news = response.data.articles || [];
+    const news = (response.data as { articles: any[] }).articles || [];
     
     const processedNews = news.map((n: any) => ({
       title: n.title,
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
         params.country = country;
     }
 
-    const response = await axios.get(endpoint, { params });
+    const response = await axios.get<{ articles: any[] }>(endpoint, { params });
     const news = response.data.articles || [];
     
     const processedNews = news.map((n: any) => ({
