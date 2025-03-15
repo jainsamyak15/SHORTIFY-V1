@@ -149,9 +149,9 @@ export default function Page() {
   );
 
   const DesktopView = () => (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-8 ">
       {/* Category Tabs */}
-      <div className="flex gap-4 mb-8">
+      <div className="flex gap-4 mt-8 mb-12">
         {categories.map((category) => (
           <button
             key={category.id}
