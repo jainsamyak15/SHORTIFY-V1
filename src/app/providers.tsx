@@ -1,6 +1,7 @@
 'use client';
 
 import {PrivyProvider} from '@privy-io/react-auth';
+import {base, baseGoerli, mainnet, goerli, polygon, polygonMumbai} from 'viem/chains';
 
 export default function Providers({children}: {children: React.ReactNode}) {
   return (
@@ -16,7 +17,7 @@ export default function Providers({children}: {children: React.ReactNode}) {
         // Create embedded wallets for users who don't have a wallet
         embeddedWallets: {
           createOnLogin: 'users-without-wallets',
-        },
+        }
       }}
     >
       {children}
